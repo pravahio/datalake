@@ -10,7 +10,7 @@ def main():
 
     # Available channels and geospaces: https://github.com/pravahio/go-mesh/wiki/Geospaces
     # '/PublicBus', '/AirQuality', '/SolarPowerProduction'
-    datalake = Datalake('pravah', 'Pr@v@h@dm!n', '/AirQuality')
+    datalake = Datalake('pravah', '', '/AirQuality')
 
     # All the data after 'start' datetime
     #cur = datalake.get({'geospace': '/in/ncr'}, start='2019/12/24 18:00:00')
