@@ -14,11 +14,11 @@ def main():
 
     datalake = Datalake('pravah', '', c.get_channel())
 
-    for m, c in feed:
+    for m, chan in feed:
         jsonObj = json.loads(MessageToJson(m))
 
-        obj = datalake.insert(c, jsonObj)
-        print(datalake.get(obj))
+        obj = datalake.insert(chan, jsonObj)
+        print('Saving [' + c.get_channel() + ' -> ' + str(geospace) + '] at ' + str(obj))
 
 if '__main__' == __name__:
     main()
