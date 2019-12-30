@@ -20,48 +20,40 @@ class Datalake:
     
     # past: 60 mins
     # start: 2019/12/23 00:00:00
-    def get(self, obj, start='', end='', past=60):
-        if isinstance(obj, ObjectId):
+    def get(self, query, start='', end='', past=60):
+        if isinstance(query, ObjectId):
             return self.collection.find_one({
-                '_id': obj
+                '_id': query
             })
-        elif isinstance(obj, dict):
-            if 'geospace' in obj:
-                if start != '' and end != '':
-                    start_date = ObjectId.from_datetime(datetime.strptime(start, '%Y/%m/%d %H:%M:%S'))
-                    end_date = ObjectId.from_datetime(datetime.strptime(end, '%Y/%m/%d %H:%M:%S'))
-                    return self.collection.find({
-                        '_id': {
-                            '$gte': start_date,
-                            '$lte': end_date
-                        },
-                        'geospace': obj['geospace'],
-                    })
-                elif start != '':
-                    print('this')
-                    start_date = ObjectId.from_datetime(datetime.strptime(start, '%Y/%m/%d %H:%M:%S'))
-                    return self.collection.find({
-                        '_id': {
-                            '$gte': start_date
-                        },
-                        'geospace': obj['geospace'],
-                    })
-                elif end != '':
-                    end_date = ObjectId.from_datetime(datetime.strptime(end, '%Y/%m/%d %H:%M:%S'))
-                    return self.collection.find({
-                        '_id': {
-                            '$lte': end_date
-                        },
-                        'geospace': obj['geospace'],
-                    })
-                else:
-                    date = datetime.utcnow() - timedelta(minutes=past) 
-                    start_date = ObjectId.from_datetime(date)
-                    return self.collection.find({
-                        '_id': {
-                            '$gte': start_date
-                        },
-                        'geospace': obj['geospace'],
-                    })
+        elif isinstance(query, dict):
+            if start != '' and end != '':
+                start_date = ObjectId.from_datetime(datetime.strptime(start, '%Y/%m/%d %H:%M:%S').astimezone())
+                end_date = ObjectId.from_datetime(datetime.strptime(end, '%Y/%m/%d %H:%M:%S').astimezone())
+                query['_id'] = {
+                    '$gte': start_date,
+                    '$lte': end_date
+                }
+                return self.collection.find(query)
+            elif start != '':
+                print('this')
+                start_date = ObjectId.from_datetime(datetime.strptime(start, '%Y/%m/%d %H:%M:%S').astimezone())
+                query['_id'] = {
+                    '$gte': start_date
+                }
+                return self.collection.find(query)
+            elif end != '':
+                end_date = ObjectId.from_datetime(datetime.strptime(end, '%Y/%m/%d %H:%M:%S').astimezone())
+                query['_id'] = {
+                    '$lte': end_date
+                }
+                return self.collection.find(query)
+            else:
+                date = datetime.utcnow() - timedelta(minutes=past) 
+                start_date = ObjectId.from_datetime(date)
+                query['_id'] = {
+                    '$gte': start_date
+                }
+                print(query)
+                return self.collection.find(query)
         raise Exception
 
