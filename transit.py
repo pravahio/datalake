@@ -8,6 +8,7 @@ geospace = [
     '/in/haryana/gurugram',
     '/in/delhi',
     '/in/mp/indore',
+    '/in/maharastra/pune',
     '/in/karnataka/mysore',
     '/us/oregon/portland',
     '/us/kentucky/louisville',
@@ -19,17 +20,16 @@ geospace = [
     '/aus/victoria/kingston'
 ]
 
-def main():
+def start():
     c = MeshGTFSR('rpc.pravah.io:5555')
     feed = c.subscribe(geospace)
 
-    datalake = Datalake('pravah', '', c.get_channel())
+    datalake = Datalake('pravah', 'Pr@v@h@dm!n', c.get_channel())
 
     for m, c in feed:
         jsonObj = json.loads(MessageToJson(m))
-        print(c)
         obj = datalake.insert(c, jsonObj)
-        print(str(obj) + ': ' + c)
+        print('[TRANSIT] ' + str(obj) + ': ' + c)
 
 if '__main__' == __name__:
-    main()
+    start()

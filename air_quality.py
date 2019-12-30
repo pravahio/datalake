@@ -8,17 +8,17 @@ geospace = [
     '/in/ncr'
 ]
 
-def main():
+def start():
     c = MeshAirQuality('rpc.pravah.io:5555')
     feed = c.subscribe(geospace)
 
-    datalake = Datalake('pravah', '', c.get_channel())
+    datalake = Datalake('pravah', 'Pr@v@h@dm!n', c.get_channel())
 
     for m, chan in feed:
         jsonObj = json.loads(MessageToJson(m))
 
         obj = datalake.insert(chan, jsonObj)
-        print('Saving [' + c.get_channel() + ' -> ' + str(geospace) + '] at ' + str(obj))
+        print('[AIR_QUALITY] ' + str(obj) + ': ' + chan)
 
 if '__main__' == __name__:
-    main()
+    start()
