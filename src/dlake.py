@@ -53,7 +53,6 @@ class Datalake:
                 query['_id'] = {
                     '$gte': start_date
                 }
-                print(query)
                 return self.collection.find(query)
         raise Exception
 
