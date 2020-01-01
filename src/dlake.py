@@ -20,7 +20,7 @@ class Datalake:
     
     # past: 60 mins
     # start: 2019/12/23 00:00:00
-    def get(self, query, start='', end='', past=60):
+    def get(self, query, start='', end='', past_hours=0, past_minutes=1, past_seconds=0):
         if isinstance(query, ObjectId):
             return self.collection.find_one({
                 '_id': query
@@ -48,7 +48,7 @@ class Datalake:
                 }
                 return self.collection.find(query)
             else:
-                date = datetime.utcnow() - timedelta(minutes=past) 
+                date = datetime.utcnow() - timedelta(hours=past_hours, minutes=past_minutes, seconds=past_seconds) 
                 start_date = ObjectId.from_datetime(date)
                 query['_id'] = {
                     '$gte': start_date
