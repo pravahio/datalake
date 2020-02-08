@@ -26,7 +26,6 @@ class Datalake:
             })
         elif isinstance(query, dict):
             kwargs = self.set_time_args_defaults(**kwargs)
-            print(kwargs)
             self.get_query_for_time_bound(query, kwargs[TimeParam.Start], kwargs[TimeParam.End], kwargs[TimeParam.PastDays], kwargs[TimeParam.PastHours], kwargs[TimeParam.PastMinutes], kwargs[TimeParam.PastSeconds])
             print(query)
             return self.collection.find(query)
