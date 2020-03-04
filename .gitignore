@@ -1,3 +1,6 @@
 __pycache__/
-dlake.egg-info/
+*.egg-info/
 .DS_Store
+
+build/
+dist/
