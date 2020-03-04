@@ -3,16 +3,15 @@ import pytz
 
 from dlake import Datalake
 
-geospace = [
-    '/in/ncr'
-]
-
 def main():
 
     # Available channels and geospaces: https://github.com/pravahio/go-mesh/wiki/Geospaces
     # '/PublicBus', '/AirQuality', '/SolarPowerProduction'
     # Geospaces would differ from channel to channel.
-    datalake = Datalake('pravah', '', '/AirQuality')
+    datalake = Datalake(
+        channel = '/AirQuality',
+        auth_token = 'X5I2l8eyRCivN2hwBbGXXQ42BCF5AQSziRJQz_rRoGlg'
+    )
 
     # All the data after 'start' datetime
     #cur = datalake.get({'geospace': '/in/ncr'}, start='2019/12/24 18:00:00')
@@ -36,16 +35,31 @@ def main():
     #cur = datalake.get({'geospace': '/in/ncr'}, past_hours=1, past_minutes=13, past_seconds=10)
 
     # You can also query the data using mongoDB syntax
-    cur = datalake.get({
-        "item.stations.id": "site_5050"
-        }, 
-        past_minutes=20 # mins
+    cur = datalake.get(
+        query = {
+            'item.stations.id': "site_104"
+        },
+        past_hours=3
     )
-
-    print('Total Results: ' + str(cur.count()))
-    ist = pytz.timezone('Asia/Kolkata')
-    for c in cur:
-        print(c['_id'].generation_time.astimezone(ist))
+    """ cur = datalake.aggregate(pipeline=[
+        {
+            "$group": {
+                "_id": "$item.stations.id",
+                "arr": {
+                    "$push": "$item.stations.id"
+                }
+            }
+        }
+    ],
+    match={"item.stations.id": "site_104"},
+    past_minutes=1000) """
+    
+    if 'error' not in cur:
+        print('Total Results: ' + str(len(cur)))
+        for c in cur:
+            print(c['item']['stations'][0]['dataList'])
+    else:
+        print(cur)
 
 if '__main__' == __name__:
     main()
