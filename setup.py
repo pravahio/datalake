@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="dlake",
-    version="0.1.2",
+    version="0.1.3",
     author="Abhishek Upperwal",
     author_email="mesh@soket.in",
     description="Dynamic timer to learn the update frequency of a resource on the web",
