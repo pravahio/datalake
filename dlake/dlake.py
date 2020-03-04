@@ -1,36 +1,55 @@
+import requests
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from bson.json_util import dumps
+
+from .auth import Auth
+
+data_server = 'http://api.datalake.pravah.io:4000'
 
 class Datalake:
-    def __init__(self, usr, pwd, channel):
-        self.client = MongoClient('mongodb://datalake.pravah.io:27017/datalake', username=usr, password=pwd)
-        
-        channel = channel.replace('/', '').lower()
-        print('Working on collection: ' + channel)
-        self.collection = self.client.datalake[channel]
+    def __init__(self, channel, auth_token):
+        self.channel = channel
+        self.auth = Auth(auth_token)
 
-    def insert(self, geospace, obj):
-        data = {
-            'geospace': geospace,
-            'item': obj
-        }
-        return self.collection.insert(data)
+    # def insert(self, geospace, obj):
+    #     data = {
+    #         'geospace': geospace,
+    #         'item': obj
+    #     }
+    #     return self.collection.insert(data)
+    
+    def get(self, query={}, **kwargs):
+        j = kwargs.copy()
+        
+        j['channel'] = self.channel
+        j['access_token'] = str(self.auth.get_token())
+
+        if bool(query):
+            j['query'] = query
+        
+        print(j)
+        res = requests.post(data_server + '/get', data=dumps(j))
+
+        print(res.content)
+
+        return res.json()
     
     # past: 60 mins
     # start: 2019/12/23 00:00:00
-    def get(self, query={}, **kwargs):
-        if isinstance(query, ObjectId):
-            return self.collection.find_one({
-                '_id': query
-            })
-        elif isinstance(query, dict):
-            kwargs = self.set_time_args_defaults(**kwargs)
-            self.get_query_for_time_bound(query, kwargs[TimeParam.Start], kwargs[TimeParam.End], kwargs[TimeParam.PastDays], kwargs[TimeParam.PastHours], kwargs[TimeParam.PastMinutes], kwargs[TimeParam.PastSeconds])
-            print(query)
-            return self.collection.find(query)
+    # def get(self, query={}, **kwargs):
+    #     if isinstance(query, ObjectId):
+    #         return self.collection.find_one({
+    #             '_id': query
+    #         })
+    #     elif isinstance(query, dict):
+    #         kwargs = self.set_time_args_defaults(**kwargs)
+    #         self.get_query_for_time_bound(query, kwargs[TimeParam.Start], kwargs[TimeParam.End], kwargs[TimeParam.PastDays], kwargs[TimeParam.PastHours], kwargs[TimeParam.PastMinutes], kwargs[TimeParam.PastSeconds])
+    #         print(query)
+    #         return self.collection.find(query)
 
-    def aggregate(self, group_by='', push={}, pipeline=[], match={}, **kwargs):
+    def aggregate(self, pipeline=[], match={}, **kwargs):
         
         final_agg = []
 
@@ -43,7 +62,17 @@ class Datalake:
             })
         final_agg = final_agg + pipeline
 
-        return self.collection.aggregate(final_agg)
+        j = {}
+        j['channel'] = self.channel
+        j['access_token'] = str(self.auth.get_token())
+        j['pipeline'] = final_agg
+
+        print(dumps(j))
+        res = requests.post(data_server + '/aggregate', data=dumps(j))
+
+        return res.json()
+
+        #return self.collection.aggregate(final_agg)
 
     def get_query_for_time_bound(self, query, start, end, past_days, past_hours, past_minutes, past_seconds):
         if start != '' and end != '':
