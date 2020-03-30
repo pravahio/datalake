@@ -8,10 +8,10 @@ class Auth:
         self.auth_token = self.get_access_token(auth_token)
 
     def get_access_token(self, auth_token, client_id=''):
-        real_path = os.path.join(os.path.dirname(__file__), 'chain.pravah.io.crt')
+        #real_path = os.path.join(os.path.dirname(__file__), 'chain.pravah.io.crt')
         res = requests.post(auth_server + '/token', json={
             'authentication_token': auth_token
-        }, timeout=15, verify=real_path)
+        }, timeout=15, verify=True)
 
         resJSON = res.json()
         err = resJSON.get('error', None)
