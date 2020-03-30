@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="dlake",
-    version="0.1.3",
+    version="0.1.7",
     author="Abhishek Upperwal",
     author_email="mesh@soket.in",
     description="Dynamic timer to learn the update frequency of a resource on the web",
@@ -25,6 +25,8 @@ setuptools.setup(
     },
     include_package_data=True,
     install_requires = [
-        'pymongo'
+        'pymongo',
+        'requests',
+        'datetime'
     ]
 )
