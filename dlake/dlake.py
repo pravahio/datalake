@@ -1,6 +1,5 @@
 import requests
 from datetime import datetime, timedelta
-from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 
@@ -28,11 +27,19 @@ class Datalake:
 
         if bool(query):
             j['query'] = query
-        
-        print(j)
         res = requests.post(data_server + '/get', data=dumps(j))
 
-        print(res.content)
+        return res.json()
+
+    def latest(self, query={}, **kwargs):
+        j = kwargs.copy()
+        
+        j['channel'] = self.channel
+        j['access_token'] = str(self.auth.get_token())
+
+        if bool(query):
+            j['query'] = query
+        res = requests.post(data_server + '/latest', data=dumps(j))
 
         return res.json()
     
@@ -106,8 +113,9 @@ class Datalake:
         kwargs.setdefault(TimeParam.End, '')
         kwargs.setdefault(TimeParam.PastDays, 0)
         kwargs.setdefault(TimeParam.PastHours, 0)
-        kwargs.setdefault(TimeParam.PastMinutes, 1)
+        kwargs.setdefault(TimeParam.PastMinutes, 0)
         kwargs.setdefault(TimeParam.PastSeconds, 0)
+        kwargs.setdefault(TimeParam.Latest, True)
 
         return kwargs
 
@@ -118,4 +126,5 @@ class TimeParam:
     PastHours = 'past_hours'
     PastMinutes = 'past_minutes'
     PastSeconds = 'past_seconds'
+    Latest = 'latest'
     
